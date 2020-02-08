@@ -1,6 +1,6 @@
 import hashlib
 import requests
-
+from random import randint
 import sys
 
 from uuid import uuid4
@@ -23,8 +23,12 @@ def proof_of_work(last_proof):
     start = timer()
 
     print("Searching for next proof")
-    proof = 0
-    #  TODO: Your code here
+    proof = last_proof*randint(0,100)
+    
+    last_hash = hashlib.sha256(f'{last_proof}'.encode()).hexdigest()
+    #  TODO: Your code here	    proof = last_proof*randint(0, 100)
+    while valid_proof(last_hash, proof) is False:
+        proof += 1
 
     print("Proof found: " + str(proof) + " in " + str(timer() - start))
     return proof
@@ -39,8 +43,16 @@ def valid_proof(last_hash, proof):
     IE:  last_hash: ...AE9123456, new hash 123456E88...
     """
 
-    # TODO: Your code here!
-    pass
+
+    guess_hash = hashlib.sha256(f'{proof}'.encode()).hexdigest()
+    # TODO: Your code here!	    if guess_hash[:6] == last_hash[-6:]:
+    if guess_hash[:6] == last_hash[-6:]:
+        print('Guess Hash is:', guess_hash[:6], 'and the Last Hash is:', last_hash[-6:])
+        return True
+    else:
+        return False
+
+
 
 
 if __name__ == '__main__':
@@ -61,7 +73,8 @@ if __name__ == '__main__':
     if id == 'NONAME\n':
         print("ERROR: You must change your name in `my_id.txt`!")
         exit()
-    # Run forever until interrupted
+
+  # Run forever until interrupted
     while True:
         # Get the last proof from the server
         r = requests.get(url=node + "/last_proof")
